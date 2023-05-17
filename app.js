@@ -3,7 +3,8 @@ const auth =
 
 const gallery = document.querySelector(".gallery")
 const searchInput = document.querySelector(".search-input")
-const searchForm = document.querySelector(".search-form")
+const form = document.querySelector(".search-form")
+let searchValue;
 
 function curatedPhoto() {
     fetch("https://api.pexels.com/v1/curated?per_page=20", {
@@ -19,9 +20,9 @@ function curatedPhoto() {
 
 curatedPhoto()
 
-function displayPhoto (photos){
+function displayPhoto(photos) {
     let allPhotos = photos.photos
-    
+
     allPhotos.forEach(photo => {
         // console.log(photo);
         const gallerImage = document.createElement("div")
@@ -29,51 +30,62 @@ function displayPhoto (photos){
         gallerImage.innerHTML = `
         
         <img src="${photo.src.large}" alt="">
-        <a href="${photo.src.original}">Download</a>
-        <p>${photo.photographer}</p>
+        <div class="gallery-info">
+            <p>${photo.photographer}</p>
+            <a href="${photo.src.original}">Download</a>
+        </div>
 
         `
         gallery.appendChild(gallerImage)
     });
 }
 
-function searchPhotos(){
-    fetch(`https://api.pexels.com/v1/search?query=nature&per_page=5`, {
+function searchPhotos(query) {
+    fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=5`, {
         method: "GET",
         headers: {
             Accept: "application/json",
             Authorization: auth
         }
     })
-    .then(res => res.json())
-    .then(data => displaySearch(data))
+        .then(res => res.json())
+        .then(data => displaySearch(data))
 }
 
 // searchPhotos()
 
-function displaySearch(query){
+function displaySearch(query) {
     let allphotos = query.photos
     console.log(allphotos)
 
-    allPhotos.forEach(photo => {
+    allphotos.forEach(photo => {
         // console.log(photo);
         const gallerImage = document.createElement("div")
         gallerImage.classList.add("gallery-img")
         gallerImage.innerHTML = `
         
         <img src="${photo.src.large}" alt="">
-        <a href="${photo.src.original}">Download</a>
-        <p>${photo.photographer}</p>
+        <div class="gallery-info">
+            <p>${photo.photographer}</p>
+            <a href="${photo.src.original}">Download</a>
+        </div>
 
         `
         gallery.appendChild(gallerImage)
     });
 
 }
- searchInput.addEventListener("input", updateSearch)
+searchInput.addEventListener("input", updateSearch)
 
- function updateSearch (e){
-    console.log(e)
- }
+function updateSearch(e) {
+    searchValue = e.target.value
+}
+
+form.addEventListener("submit", (e) => {
+    gallery.innerHTML = ""
+    e.preventDefault()
+    searchPhotos(searchValue)
+    searchInput.value = ""
+})
 
 
